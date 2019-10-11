@@ -1,9 +1,10 @@
 package chip8.command
 
 import chip8.cpu.Chip8Cpu
+import chip8.entity.Chip8Word
 
 class Opcode3Handler(val cpu: Chip8Cpu) : OpcodeHandler {
-    override fun execute(opcodeWordData: Int): Int {
+    override fun execute(opcodeWordData: Chip8Word): Int {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

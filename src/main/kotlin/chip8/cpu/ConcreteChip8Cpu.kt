@@ -1,8 +1,10 @@
 package chip8.cpu
 
 import chip8.command.Chip8CommandHandler
+import chip8.entity.Chip8Byte
+import chip8.entity.Chip8Word
 import chip8.util.Chip8Util
-import chip8.video.VideoDisplayProcessingUnit
+import chip8.video.Chip8VideoDisplayProcessingUnit
 import java.util.*
 
 class ConcreteChip8Cpu : Chip8Cpu {
@@ -18,51 +20,51 @@ class ConcreteChip8Cpu : Chip8Cpu {
     private val memory = Array(0xFFF) { 0x0 }
     private val commandHandler = Chip8CommandHandler(this)
 
-    override fun connectToVideoDisplayProcessingUnit(videoDisplayProcessingUnit: VideoDisplayProcessingUnit) {
-        commandHandler.setVideoDisplayProcessingUnit(videoDisplayProcessingUnit)
+    override fun connectToVideoDisplayProcessingUnit(chip8VideoDisplayProcessingUnit: Chip8VideoDisplayProcessingUnit) {
+        commandHandler.setVideoDisplayProcessingUnit(chip8VideoDisplayProcessingUnit)
     }
 
-    override fun setRegisterByteValue(register: CpuByteRegister, value: Int) {
-        registers[register.registerNumber] = Chip8Util.toByte(value)
+    override fun setRegisterByteValue(register: CpuByteRegister, byte: Chip8Byte) {
+        registers[register.registerNumber] = byte.value
     }
 
-    override fun getByteRegisterValue(register: CpuByteRegister): Int {
-        return Chip8Util.toByte(registers[register.registerNumber])
+    override fun getByteRegisterValue(register: CpuByteRegister): Chip8Byte {
+        return Chip8Byte(registers[register.registerNumber])
     }
 
     override fun getRegisterByteSymbolByNumber(registerNumber: Int): CpuByteRegister {
         return CpuByteRegister.SYMBOL_ARRAY[registerNumber]
     }
 
-    override fun push(word: Int) {
-        stack.push(programCounter)
+    override fun push(word: Chip8Word) {
+        stack.push(word.value)
     }
 
-    override fun pop(): Int =
-        stack.pop()
+    override fun pop(): Chip8Word =
+        Chip8Word(stack.pop())
 
-    override fun setRegisterWordValue(register: CpuWordRegister, value: Int) {
+    override fun setRegisterWordValue(register: CpuWordRegister, word: Chip8Word) {
         when (register) {
             CpuWordRegister.I -> {
-                addressRegister = Chip8Util.toWord(value)
+                addressRegister = word.value
             }
             CpuWordRegister.PC -> {
-                programCounter = Chip8Util.toWord(value)
+                programCounter = word.value
             }
         }
     }
 
-    override fun getWordRegisterValue(register: CpuWordRegister): Int {
+    override fun getWordRegisterValue(register: CpuWordRegister): Chip8Word {
         return when (register) {
-            CpuWordRegister.I -> addressRegister
-            CpuWordRegister.PC -> programCounter
+            CpuWordRegister.I -> Chip8Word(addressRegister)
+            CpuWordRegister.PC -> Chip8Word(programCounter)
         }
     }
 
     override fun executeSingleInstruction(): Int {
         val opcodeWordData = getOpcodeWordData()
-        return commandHandler.executeCommandFromOpcodeData(opcodeWordData = opcodeWordData)
 
+        return commandHandler.executeCommandFromOpcodeData(opcodeWordData = opcodeWordData)
     }
 
     override fun executeForNumberOfCycles(numberOfCycles: Int) {
@@ -73,14 +75,14 @@ class ConcreteChip8Cpu : Chip8Cpu {
         }
     }
 
-    override fun writeByteToMemory(address: Int, byte: Int) {
-        memory[address] = Chip8Util.toByte(byte)
+    override fun writeByteToMemory(address: Chip8Word, byte: Chip8Byte) {
+        memory[address.value] = byte.value
     }
 
-    override fun readByteFromMemory(address: Int): Int =
-        Chip8Util.toByte(memory[address])
+    override fun readByteFromMemory(address: Chip8Word): Chip8Byte =
+        Chip8Byte(memory[address.value])
 
-    private fun getOpcodeWordData(): Int {
+    private fun getOpcodeWordData(): Chip8Word {
         val pc = programCounter
 
         //

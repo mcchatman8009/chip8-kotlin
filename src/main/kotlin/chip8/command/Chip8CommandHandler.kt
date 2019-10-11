@@ -1,12 +1,13 @@
 package chip8.command
 
 import chip8.cpu.Chip8Cpu
-import chip8.video.VideoDisplayProcessingUnit
+import chip8.entity.Chip8Word
+import chip8.video.Chip8VideoDisplayProcessingUnit
 
 class Chip8CommandHandler(private val cpu: Chip8Cpu) {
     private val handlerTable: Array<OpcodeHandler> = Array(16) { Opcode0Handler(cpu) }
 
-    fun setVideoDisplayProcessingUnit(vdp: VideoDisplayProcessingUnit) {
+    fun setVideoDisplayProcessingUnit(vdp: Chip8VideoDisplayProcessingUnit) {
         handlerTable[0xD] = OpcodeDHandler(cpu, vdp)
     }
 
@@ -28,8 +29,11 @@ class Chip8CommandHandler(private val cpu: Chip8Cpu) {
         handlerTable[0xF] = OpcodeFHandler(cpu)
     }
 
-    fun executeCommandFromOpcodeData(opcodeWordData: Int): Int {
-        val handlerCode = (opcodeWordData and 0xF000) shr 12
+    fun executeCommandFromOpcodeData(opcodeWordData: Chip8Word): Int {
+        //
+        // Here we're grabbing the most significant nibble to figure out the opcode
+        //
+        val handlerCode = opcodeWordData.highOrderByte.highOrderNibble
 
         val handler = handlerTable[handlerCode]
 

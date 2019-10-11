@@ -1,27 +1,29 @@
 package chip8.cpu
 
-import chip8.video.VideoDisplayProcessingUnit
+import chip8.entity.Chip8Byte
+import chip8.entity.Chip8Word
+import chip8.video.Chip8VideoDisplayProcessingUnit
 
 interface Chip8Cpu {
     /**
      * Sets the value of a register
      */
-    fun setRegisterWordValue(register: CpuWordRegister, value: Int)
+    fun setRegisterWordValue(register: CpuWordRegister, word: Chip8Word)
 
     /**
      * Gets the register value
      */
-    fun getWordRegisterValue(register: CpuWordRegister): Int
+    fun getWordRegisterValue(register: CpuWordRegister): Chip8Word
 
     /**
      * Sets the value of a register
      */
-    fun setRegisterByteValue(register: CpuByteRegister, value: Int)
+    fun setRegisterByteValue(register: CpuByteRegister, byte: Chip8Byte)
 
     /**
      * Gets the register value
      */
-    fun getByteRegisterValue(register: CpuByteRegister): Int
+    fun getByteRegisterValue(register: CpuByteRegister): Chip8Byte
 
     /**
      * This is useful if you would like to find out one of the Vx register symbols
@@ -31,12 +33,12 @@ interface Chip8Cpu {
     /**
      * Pushes WORD (NNN) value onto the stack
      */
-    fun push(word: Int)
+    fun push(word: Chip8Word)
 
     /**
      * Pops a Word off the stack
      */
-    fun pop(): Int
+    fun pop(): Chip8Word
 
     /**
      * Executes a single instruction and returns the number of cpu cycles taken
@@ -48,12 +50,12 @@ interface Chip8Cpu {
      */
     fun executeForNumberOfCycles(numberOfCycles: Int)
 
-    fun writeByteToMemory(address: Int, byte: Int)
+    fun writeByteToMemory(address: Chip8Word, byte: Chip8Byte)
 
-    fun readByteFromMemory(address: Int): Int
+    fun readByteFromMemory(address: Chip8Word): Chip8Byte
 
     /**
      * Connect the CPU to the Video  Display Processing Unit
      */
-    fun connectToVideoDisplayProcessingUnit(videoDisplayProcessingUnit: VideoDisplayProcessingUnit)
+    fun connectToVideoDisplayProcessingUnit(chip8VideoDisplayProcessingUnit: Chip8VideoDisplayProcessingUnit)
 }
