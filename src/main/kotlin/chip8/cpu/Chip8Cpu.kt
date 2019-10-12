@@ -52,7 +52,11 @@ interface Chip8Cpu {
 
     fun writeByteToMemory(address: Chip8Word, byte: Chip8Byte)
 
+    fun writeWordToMemory(address: Chip8Word, byte: Chip8Word)
+
     fun readByteFromMemory(address: Chip8Word): Chip8Byte
+
+    fun readWordFromMemory(address: Chip8Word): Chip8Word
 
     /**
      * Connect the CPU to the Video  Display Processing Unit

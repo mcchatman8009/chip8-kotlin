@@ -5,14 +5,14 @@ import chip8.entity.Chip8Word
 import chip8.video.Chip8VideoDisplayProcessingUnit
 
 class Chip8CommandHandler(private val cpu: Chip8Cpu) {
-    private val handlerTable: Array<OpcodeHandler> = Array(16) { Opcode0Handler(cpu) }
+    private val handlerTable: Array<OpcodeHandler> = Array(16) { Opcode1Handler(cpu) }
 
     fun setVideoDisplayProcessingUnit(vdp: Chip8VideoDisplayProcessingUnit) {
         handlerTable[0xD] = OpcodeDHandler(cpu, vdp)
+        handlerTable[0x0] = Opcode0Handler(cpu, vdp)
     }
 
     init {
-        handlerTable[0x0] = Opcode0Handler(cpu)
         handlerTable[0x1] = Opcode1Handler(cpu)
         handlerTable[0x2] = Opcode2Handler(cpu)
         handlerTable[0x3] = Opcode3Handler(cpu)
@@ -32,6 +32,7 @@ class Chip8CommandHandler(private val cpu: Chip8Cpu) {
     fun executeCommandFromOpcodeData(opcodeWordData: Chip8Word): Int {
         //
         // Here we're grabbing the most significant nibble to figure out the opcode
+        // 0xF0000
         //
         val handlerCode = opcodeWordData.highOrderByte.highOrderNibble
 

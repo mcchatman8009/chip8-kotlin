@@ -2,7 +2,7 @@ package chip8.video
 
 class ConcreteChip8VideoDisplayProcessingUnit : Chip8VideoDisplayProcessingUnit {
     private val pixelData: Array<Array<Boolean>> = Array(Chip8VideoDisplayProcessingUnit.SCREEN_WIDTH) {
-        Array(Chip8VideoDisplayProcessingUnit.SCREEN_HEIGHT) { false }
+        Array(Chip8VideoDisplayProcessingUnit.SCREEN_HEIGHT) { true }
     }
 
     override fun setPixel(x: Int, y: Int, enableColor: Boolean) {

@@ -17,7 +17,7 @@ class ConcreteChip8Cpu : Chip8Cpu {
     private var addressRegister = 0x0
     // The 16 bit stack
     private val stack = ArrayDeque<Int>()
-    private val memory = Array(0xFFF) { 0x0 }
+    private val memory = Array(0x1000) { 0x0 }
     private val commandHandler = Chip8CommandHandler(this)
 
     override fun connectToVideoDisplayProcessingUnit(chip8VideoDisplayProcessingUnit: Chip8VideoDisplayProcessingUnit) {
@@ -83,6 +83,23 @@ class ConcreteChip8Cpu : Chip8Cpu {
         Chip8Byte(memory[address.value])
 
     private fun getOpcodeWordData(): Chip8Word {
+        val pc = programCounter
+
+        //
+        // Read the opco bytes as big endian
+        //
+        val highByte = memory[pc]
+        val lowByte = memory[pc + 1]
+
+        return Chip8Util.toWord(highByte = highByte, lowByte = lowByte)
+    }
+
+    override fun writeWordToMemory(address: Chip8Word, byte: Chip8Word) {
+        writeByteToMemory(address, byte.highOrderByte)
+        writeByteToMemory(address.addTo(1), byte.lowOrderOrderByte)
+    }
+
+    override fun readWordFromMemory(address: Chip8Word): Chip8Word {
         val pc = programCounter
 
         //
