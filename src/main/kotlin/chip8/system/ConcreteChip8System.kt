@@ -1,41 +1,49 @@
 package chip8.system
 
-import chip8.cpu.Chip8Cpu
-import chip8.cpu.CpuWordRegister
-import chip8.entity.Chip8Byte
-import chip8.entity.Chip8Word
+import chip8.cpu.ConcreteChip8Cpu
+import chip8.input.ConcreteChip8InputProcessingUnit
+import chip8.rom.ConcreteChip8RomLoader
+import chip8.sound.ConcreteChip8SoundTimer
+import chip8.timer.ConcreteChip8Timer
+import chip8.video.ConcreteChip8VideoDisplayProcessingUnit
 
-class ConcreteChip8System(private val cpu: Chip8Cpu) : Chip8System {
+class ConcreteChip8System : Chip8System {
+    private val cpu = ConcreteChip8Cpu()
+    private val inputProcessingUnit = ConcreteChip8InputProcessingUnit(cpu)
+    private val videoDisplayProcessingUnit = ConcreteChip8VideoDisplayProcessingUnit()
+    private val romLoader = ConcreteChip8RomLoader(cpu)
+    private val soundTimer = ConcreteChip8SoundTimer(Runnable {})
+    private val timer = ConcreteChip8Timer()
+    private var romLoaded = true
 
     override fun initialize() {
-        cpu.setRegisterWordValue(CpuWordRegister.PC, Chip8Word(0x200))
+        romLoaded = false
+        videoDisplayProcessingUnit.clearDisplay()
+        timer.initialize()
+        soundTimer.initialize()
+        inputProcessingUnit.initialize()
 
-        (0 until 16).forEach {
-            val symbol = cpu.getRegisterByteSymbolByNumber(it)
-            cpu.setRegisterByteValue(symbol, Chip8Byte(0))
-        }
-
-        (0 until 0x1_00_00).forEach {
-            cpu.writeByteToMemory(Chip8Word(it), Chip8Byte(0))
-        }
-    }
-
-    override fun runSingleInstruction() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        cpu.connectToInputProcessingUnit(inputProcessingUnit)
+        cpu.connectToSoundTimer(soundTimer)
+        cpu.connectToTimer(timer)
+        cpu.connectToVideoDisplayProcessingUnit(videoDisplayProcessingUnit)
+        cpu.initialize()
     }
 
     override fun loadRom(romBytes: ByteArray) {
-        var address = 0x200
-        var i = 0
-
-        while (i < romBytes.size) {
-            val addressWord = Chip8Word(address)
-            val byte = Chip8Byte(romBytes[i].toInt())
-
-            cpu.writeByteToMemory(addressWord, byte)
-            i++
-            address++
-        }
+        cpu.initialize()
+        romLoader.loadRom(romBytes)
+        romLoaded = true
     }
 
+    override fun runForNumberOfCpuCycles(cycles: Int) {
+        cpu.executeForNumberOfCycles(cycles)
+    }
+
+    override fun getPixelAt(x: Int, y: Int): Boolean =
+        videoDisplayProcessingUnit.getPixel(x, y)
+
+    override fun setRenderCallback(renderFunction: (x: Int, y: Int, enableColor: Boolean) -> Unit) {
+        videoDisplayProcessingUnit.setRenderCallback(renderFunction)
+    }
 }

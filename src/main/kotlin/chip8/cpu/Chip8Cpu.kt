@@ -2,6 +2,9 @@ package chip8.cpu
 
 import chip8.entity.Chip8Byte
 import chip8.entity.Chip8Word
+import chip8.input.Chip8InputProcessingUnit
+import chip8.sound.Chip8SoundTimer
+import chip8.timer.Chip8Timer
 import chip8.video.Chip8VideoDisplayProcessingUnit
 
 interface Chip8Cpu {
@@ -58,8 +61,16 @@ interface Chip8Cpu {
 
     fun readWordFromMemory(address: Chip8Word): Chip8Word
 
+    fun initialize()
+
     /**
      * Connect the CPU to the Video  Display Processing Unit
      */
     fun connectToVideoDisplayProcessingUnit(chip8VideoDisplayProcessingUnit: Chip8VideoDisplayProcessingUnit)
+
+    fun connectToInputProcessingUnit(inputProcessingUnit: Chip8InputProcessingUnit)
+
+    fun connectToSoundTimer(timer: Chip8SoundTimer)
+
+    fun connectToTimer(timer: Chip8Timer)
 }

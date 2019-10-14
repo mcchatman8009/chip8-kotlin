@@ -21,4 +21,8 @@ class ConcreteChip8SoundTimer(private val runnableSound: Runnable) : Chip8SoundT
            runnableSound.run()
         }
     }
+
+    override fun initialize() {
+        counter = 0
+    }
 }

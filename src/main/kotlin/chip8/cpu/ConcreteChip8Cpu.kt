@@ -3,6 +3,9 @@ package chip8.cpu
 import chip8.command.Chip8CommandHandler
 import chip8.entity.Chip8Byte
 import chip8.entity.Chip8Word
+import chip8.input.Chip8InputProcessingUnit
+import chip8.sound.Chip8SoundTimer
+import chip8.timer.Chip8Timer
 import chip8.util.Chip8Util
 import chip8.video.Chip8VideoDisplayProcessingUnit
 import java.util.*
@@ -17,8 +20,40 @@ class ConcreteChip8Cpu : Chip8Cpu {
     private var addressRegister = 0x0
     // The 16 bit stack
     private val stack = ArrayDeque<Int>()
-    private val memory = Array(0x1000) { 0x0 }
+    private val memory = Array(0x1_00_00) { 0x0 }
     private val commandHandler = Chip8CommandHandler(this)
+
+    override fun initialize() {
+        commandHandler.initialize()
+        setRegisterWordValue(CpuWordRegister.PC, Chip8Word(0x200))
+        setRegisterWordValue(CpuWordRegister.I, Chip8Word(0x0))
+
+
+        (0 until 16).forEach {
+            val symbol = getRegisterByteSymbolByNumber(it)
+            setRegisterByteValue(symbol, Chip8Byte(0))
+        }
+
+        (0 until 0xFF_FF).forEach {
+            writeByteToMemory(Chip8Word(it), Chip8Byte(0))
+        }
+
+        (0 until Chip8VideoDisplayProcessingUnit.CHARACTER_SPRITES.size).forEachIndexed { index, data ->
+            writeByteToMemory(Chip8Word(index), Chip8Byte(data))
+        }
+    }
+
+    override fun connectToInputProcessingUnit(inputProcessingUnit: Chip8InputProcessingUnit) {
+        commandHandler.setInputProcessingUnit(inputProcessingUnit)
+    }
+
+    override fun connectToSoundTimer(timer: Chip8SoundTimer) {
+        commandHandler.setSoundTimer(timer)
+    }
+
+    override fun connectToTimer(timer: Chip8Timer) {
+        commandHandler.setTimer(timer)
+    }
 
     override fun connectToVideoDisplayProcessingUnit(chip8VideoDisplayProcessingUnit: Chip8VideoDisplayProcessingUnit) {
         commandHandler.setVideoDisplayProcessingUnit(chip8VideoDisplayProcessingUnit)
@@ -73,6 +108,8 @@ class ConcreteChip8Cpu : Chip8Cpu {
         while (cycles < numberOfCycles) {
             cycles += executeSingleInstruction()
         }
+
+        return
     }
 
     override fun writeByteToMemory(address: Chip8Word, byte: Chip8Byte) {
@@ -90,6 +127,8 @@ class ConcreteChip8Cpu : Chip8Cpu {
         //
         val highByte = memory[pc]
         val lowByte = memory[pc + 1]
+
+        programCounter += 2
 
         return Chip8Util.toWord(highByte = highByte, lowByte = lowByte)
     }
