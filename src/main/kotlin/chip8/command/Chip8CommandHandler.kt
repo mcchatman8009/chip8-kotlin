@@ -47,14 +47,19 @@ class Chip8CommandHandler(private val cpu: Chip8Cpu) {
         handlerTable[0xB] = OpcodeBHandler(cpu)
         handlerTable[0xC] = OpcodeCHandler(cpu)
         handlerTable[0xD] = OpcodeDHandler(cpu, vdp!!)
-        handlerTable[0xE] = OpcodeEHandler(cpu, inputProcessingUnit!!)
+//        handlerTable[0xE] = OpcodeEHandler(cpu, inputProcessingUnit!!)
+        handlerTable[0xE] = OpcodeEHandler(cpu)
         handlerTable[0xF] =
             OpcodeFHandler(
-                cpu = cpu,
-                inputProcessingUnit = inputProcessingUnit!!,
-                timer = timer!!,
-                soundTimer = soundTimer!!
+                cpu = cpu
             )
+//        handlerTable[0xF] =
+//            OpcodeFHandler(
+//                cpu = cpu,
+//                inputProcessingUnit = inputProcessingUnit!!,
+//                timer = timer!!,
+//                soundTimer = soundTimer!!
+//            )
 
     }
 
