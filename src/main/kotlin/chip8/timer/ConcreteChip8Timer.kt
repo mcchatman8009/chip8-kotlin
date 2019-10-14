@@ -18,4 +18,8 @@ class ConcreteChip8Timer : Chip8Timer {
             counter--
         }
     }
+
+    override fun initialize() {
+        counter = 0
+    }
 }

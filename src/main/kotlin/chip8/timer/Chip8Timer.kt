@@ -6,4 +6,5 @@ interface Chip8Timer {
     fun setTimerCounter(counter: Chip8Byte)
     fun getTimerCounter(): Chip8Byte
     fun decrementTimer()
+    fun initialize()
 }
